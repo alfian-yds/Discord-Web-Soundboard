@@ -1,0 +1,37 @@
+# Nginx reverse proxy for the Soundboard.
+# 1. Replace "soundboard.example.com" with your domain.
+# 2. Replace 3001 if PORT in .env differs.
+# 3. Save to /etc/nginx/sites-available/soundboard then symlink to sites-enabled.
+# 4. `sudo nginx -t && sudo systemctl reload nginx`
+# 5. Run `sudo certbot --nginx -d soundboard.example.com` for HTTPS —
+#    certbot automatically adds the listen 443 block + certificate + redirect here.
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name soundboard.example.com;
+
+    # Upload size limit (match/greater than MAX_UPLOAD_MB).
+    client_max_body_size 16M;
+
+    # WebSocket (realtime status & log) at /ws
+    location /ws {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+    }
+
+    # Everything else
+    location / {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}

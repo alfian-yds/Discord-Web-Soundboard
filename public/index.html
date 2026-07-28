@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Soundboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Nunito:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ============ LOGIN ============ -->
+  <div id="login" class="login-screen hidden">
+    <form id="login-form" class="login-card">
+      <div class="login-badge" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M21 15a2 2 0 0 1-2 2h-1v-5h1a2 2 0 0 1 2 2z"/><path d="M3 15a2 2 0 0 0 2 2h1v-5H5a2 2 0 0 0-2 2z"/></svg>
+      </div>
+      <h1>Soundboard</h1>
+      <p>Enter the password to get started.</p>
+      <input type="password" id="password" placeholder="Password" autocomplete="current-password" />
+      <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+      <div id="login-error" class="form-error" role="alert"></div>
+    </form>
+  </div>
+
+  <!-- ============ APP ============ -->
+  <div id="app" class="hidden">
+    <!-- Header -->
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M21 15a2 2 0 0 1-2 2h-1v-5h1a2 2 0 0 1 2 2z"/><path d="M3 15a2 2 0 0 0 2 2h1v-5H5a2 2 0 0 0-2 2z"/></svg>
+        </span>
+        <span class="brand-name">Soundboard</span>
+      </div>
+
+      <div class="topbar-right">
+        <div id="status" class="status-pill" title="Bot status">
+          <span class="dot" id="status-dot"></span>
+          <span id="status-text">Connecting…</span>
+        </div>
+        <button id="theme-btn" class="icon-btn" aria-label="Change theme" title="Change theme"></button>
+        <button id="info-btn" class="icon-btn" aria-label="How to use" title="How to use">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <!-- Step 1: Connect the bot -->
+      <section class="card">
+        <div class="card-head">
+          <span class="step-num">1</span>
+          <div>
+            <h2 class="card-title">Connect the bot to a voice channel</h2>
+            <p class="card-sub">Pick a server and voice channel, then press <strong>Join</strong>. The bot enters and is ready to play sounds.</p>
+          </div>
+        </div>
+
+        <div class="connect-grid">
+          <label class="field">
+            <span class="field-label">Server</span>
+            <select id="guild-select"><option value="">Select a server…</option></select>
+          </label>
+          <label class="field">
+            <span class="field-label">Voice channel</span>
+            <select id="channel-select"><option value="">Select a voice channel…</option></select>
+          </label>
+        </div>
+
+        <div class="btn-row">
+          <button id="join-btn" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            Join
+          </button>
+          <button id="leave-btn" class="btn btn-soft">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+            Leave
+          </button>
+          <button id="stop-btn" class="btn btn-soft">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+            Stop
+          </button>
+        </div>
+
+        <div id="now-playing" class="now-playing" aria-live="polite"></div>
+      </section>
+
+      <!-- Step 2: Search MyInstants -->
+      <section class="card">
+        <div class="card-head">
+          <span class="step-num">2</span>
+          <div>
+            <h2 class="card-title">Search sounds from MyInstants</h2>
+            <p class="card-sub">Type a keyword and press <strong>Search</strong>. Press <strong>Play</strong> to play it right away, or <strong>Save</strong> to add it to your board.</p>
+          </div>
+        </div>
+
+        <form id="mi-form" class="search-bar">
+          <span class="search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          </span>
+          <input type="text" id="mi-query" placeholder="e.g. vine boom, bruh, airhorn…" autocomplete="off" />
+          <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+        <div id="mi-status" class="hint" aria-live="polite"></div>
+        <div id="mi-results" class="mi-results"></div>
+      </section>
+
+      <!-- Step 3: Sound board -->
+      <section class="card">
+        <div class="card-head">
+          <span class="step-num">3</span>
+          <div>
+            <h2 class="card-title">Your sounds</h2>
+            <p class="card-sub">Press any button to play its sound in the voice channel.</p>
+          </div>
+          <button id="refresh-btn" class="icon-btn ml-auto" aria-label="Refresh" title="Refresh">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v5h-5"/></svg>
+          </button>
+        </div>
+
+        <!-- Upload zone -->
+        <label class="dropzone" id="upload-area">
+          <input type="file" id="file-input" accept="audio/*,.mp3,.ogg,.wav,.m4a,.webm,.flac" multiple hidden />
+          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M12 3v13"/><path d="M7 8l5-5 5 5"/></svg>
+          <span class="dropzone-title">Add your own sound</span>
+          <span class="dropzone-hint">Drag audio files here, or click to choose · mp3, ogg, wav, m4a, webm, flac</span>
+        </label>
+        <div id="upload-status" class="hint" aria-live="polite"></div>
+
+        <div id="board" class="board"></div>
+        <div id="empty" class="empty hidden">
+          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          <p>No sounds yet. Search MyInstants or upload a file to get started!</p>
+        </div>
+      </section>
+
+      <!-- Activity log -->
+      <section class="card">
+        <div class="card-head">
+          <span class="head-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>
+          </span>
+          <div>
+            <h2 class="card-title">Recent activity</h2>
+            <p class="card-sub">Who played what — from Discord chat or the web.</p>
+          </div>
+          <button id="log-refresh" class="icon-btn ml-auto" aria-label="Refresh activity" title="Refresh">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v5h-5"/></svg>
+          </button>
+        </div>
+        <ul id="activity-log" class="activity"></ul>
+        <div id="activity-empty" class="empty hidden"><p>No activity yet. Try playing a sound!</p></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ============ INFO MODAL ============ -->
+  <div id="info-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="info-title">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="info-title">How to use the Soundboard</h2>
+        <button id="info-close" class="icon-btn" aria-label="Close">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ol class="steps">
+          <li>
+            <span class="steps-num">1</span>
+            <div>
+              <h3>Connect the bot</h3>
+              <p>Pick a <strong>server</strong> and <strong>voice channel</strong>, then press <strong>Join</strong>. The status dot above turns green once the bot is in.</p>
+            </div>
+          </li>
+          <li>
+            <span class="steps-num">2</span>
+            <div>
+              <h3>Play a sound</h3>
+              <p>Press any sound button under <strong>Your sounds</strong>. It plays instantly in the voice channel.</p>
+            </div>
+          </li>
+          <li>
+            <span class="steps-num">3</span>
+            <div>
+              <h3>Search MyInstants</h3>
+              <p>Type a keyword and <strong>Search</strong>. <strong>Play</strong> it once, or <strong>Save</strong> it so it becomes a permanent button on your board.</p>
+            </div>
+          </li>
+          <li>
+            <span class="steps-num">4</span>
+            <div>
+              <h3>Add your own sound</h3>
+              <p>Drag audio files onto the <strong>Add your own sound</strong> box, or click to pick a file from your device.</p>
+            </div>
+          </li>
+          <li>
+            <span class="steps-num">5</span>
+            <div>
+              <h3>Stop &amp; leave</h3>
+              <p><strong>Stop</strong> halts the sound currently playing. <strong>Leave</strong> makes the bot exit the voice channel.</p>
+            </div>
+          </li>
+        </ol>
+        <div class="cmd-block">
+          <h3>Or via Discord chat</h3>
+          <p class="cmd-intro">Type these directly in a text channel (you must be in a voice channel):</p>
+          <ul class="cmd-list">
+            <li><code>sb! &lt;keyword&gt;</code> Play the top MyInstants sound</li>
+            <li><code>sb!list &lt;keyword&gt;</code> Show the top 5 results</li>
+            <li><code>sb!local &lt;name&gt;</code> Play a saved sound</li>
+            <li><code>sb!sounds</code> List saved sounds</li>
+            <li><code>sb!stop</code> Stop the sound</li>
+            <li><code>sb!join</code> / <code>sb!leave</code> Join / leave voice</li>
+            <li><code>sb!volume &lt;0-200&gt;</code> Set volume (%)</li>
+            <li><code>sb!help</code> Show all commands</li>
+          </ul>
+        </div>
+
+        <div class="tip">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12c.5.5 1 1.2 1 2h6c0-.8.5-1.5 1-2a7 7 0 0 0-4-12z"/></svg>
+          <p>Tip: use a regular voice channel. Avoid "join-to-create" channels since the bot can get moved automatically. The bot leaves on its own after a few minutes of inactivity.</p>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button id="info-ok" class="btn btn-primary btn-block">Got it!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
